@@ -4,6 +4,12 @@ using System.Linq;
 
 namespace Day1
 {
+   /// <summary>
+   /// A simple problem,
+   /// Find 2 inputs that add to a number and then multiple them again
+   /// 
+   /// Part2: add another input that sums to the same number
+   /// </summary>
    class Program
    {
       static void Main(string[] args)
