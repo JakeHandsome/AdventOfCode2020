@@ -4,6 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+
+/// <summary>
+/// I got stuck here for a bit because my regex was bad
+/// Overall not too difficult, just data validation
+/// 
+/// I expected part2 to be like it was so for my part1 I had already formatted everything into a dictionary
+/// </summary>
 namespace Day4
 {
    class Day4
@@ -19,15 +26,18 @@ namespace Day4
           "pid", // (Passport ID)
           // Not required "cid", // (Country ID)
       };
-
+      
+      // "Global" variables because lazy
       static int numPassport = 0;
       static int numValid = 0;
       static void Main(string[] args)
       {
          var input = File.ReadAllLines("Input.txt");
          List<string> buf = new List<string>();
+         // Go through each line and fill up a buffer
          foreach (var line in input)
          {
+            // When we find an empty line, process that buffer into a passport
             if (string.IsNullOrEmpty(line) && buf.Any())
             {
                CheckInput(buf);
@@ -37,6 +47,7 @@ namespace Day4
                buf.Add(line);
             }
          }
+         // Make sure the buffer is empty before we are done
          if (buf.Any())
          {
             CheckInput(buf);
@@ -45,6 +56,10 @@ namespace Day4
          Console.WriteLine($"Part2: {numValid}");
       }
 
+      /// <summary>
+      /// This takes in the buffer and checks if it is a passport, then checks if passport is valid
+      /// </summary>
+      /// <param name="buf">Buffer to parse</param>
       private static void CheckInput(List<string> buf)
       {
          if (IsPassport(buf, out Dictionary<string, string> passport))
@@ -59,6 +74,11 @@ namespace Day4
          return;
       }
 
+      /// <summary>
+      /// Checks all the keys in passport to make sure they are within range
+      /// </summary>
+      /// <param name="passport"></param>
+      /// <returns></returns>
       private static bool IsValid(Dictionary<string, string> passport)
       {
          bool heightValid = HeightValid(passport["hgt"]);
@@ -72,9 +92,14 @@ namespace Day4
                      passport["ecl"] == "amb" || passport["ecl"] == "blu" || passport["ecl"] == "brn" ||
                      passport["ecl"] == "gry" || passport["ecl"] == "grn" || passport["ecl"] == "hzl" || passport["ecl"] == "oth"
                 ) &&
-                Regex.IsMatch(passport["pid"], @"^\d{9}$");
+                Regex.IsMatch(passport["pid"], @"^\d{9}$"); // < This messed me up. I originally had @"\d{9}" so 10 digits got passed sometimes
       }
 
+      /// <summary>
+      /// Longer function to do height checking since it is the most complicated
+      /// </summary>
+      /// <param name="entry">The height string</param>
+      /// <returns>True if height is valid, otherwise false</returns>
       private static bool HeightValid(string entry)
       {
          int height;
@@ -101,14 +126,24 @@ namespace Day4
          return false;
       }
 
+      /// <summary>
+      /// Parses a raw buffer and produces a passport dictionary
+      /// </summary>
+      /// <param name="buf">The raw input buffer</param>
+      /// <param name="passport">out, the formatted passport dictionary</param>
+      /// <returns>True if this is a passport</returns>
       private static bool IsPassport(List<string> buf, out Dictionary<string, string> passport)
       {
+         // Join each line of the buffer with a space
          passport = string.Join(' ', buf)
+            // Then split by space to get each key/value pair
             .Split(' ')
+            // Split each key/value pair by : and make a dictionary
             .ToDictionary(
                x => x.Split(':')[0],
                x => x.Split(':')[1]
             );
+         // If the intersections bewteens they keys and ExpectedFields have the same size, the contents are identical and this is a passport
          return passport.Keys.Intersect(ExpectedFields).Count() == ExpectedFields.Count();
       }
    }
