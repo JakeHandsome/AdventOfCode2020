@@ -12,7 +12,7 @@ namespace Day2
    /// Part2:
    ///  Find a string that contains the character at (position min XOR position max)
    /// </summary>
-   class Program
+   class Day2
    {
       // Regex to match $"{min}-{max} {character}: {password}"
       private const string pattern = @"(?<min>\d+)-(?<max>\d+) (?<character>[a-zA-Z]): (?<password>[a-zA-Z]+)";
