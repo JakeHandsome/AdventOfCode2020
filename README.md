@@ -11,3 +11,4 @@ A place to store my work on the 2020 AdventOfCode https://adventofcode.com/2020
 1. Day5
 1. Day3
 1. Day4
+1. Day7
