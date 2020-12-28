@@ -2,6 +2,10 @@
 using System.IO;
 using System.Linq;
 
+/// <summary>
+/// Part 1 wasn't so bad
+/// Part 2 took a while since I had to rewrite a lot and keep the classes common
+/// </summary>
 namespace Day11
 {
    public enum SearchType
@@ -14,12 +18,15 @@ namespace Day11
    {
       public int X;
       public int Y;
-      public Slope (int x, int y)
+      public Slope(int x, int y)
       {
          X = x;
          Y = y;
       }
    }
+   /// <summary>
+   /// This represents one tile on the board
+   /// </summary>
    public class Tile
    {
       public const char FLOOR = '.';
@@ -29,6 +36,9 @@ namespace Day11
       private int Y { get; }
       public char state { get; private set; }
       private char newState { get; set; }
+      /// <summary>
+      /// There are all the directions for the line of sight check
+      /// </summary>
       private readonly Slope[] Directions = new Slope[] {
             new Slope( 1,  0),
             new Slope( 1,  1),
@@ -52,6 +62,11 @@ namespace Day11
             return state == Tile.OCCUPIED;
          }
       }
+      /// <summary>
+      /// Returns the number of occupied adjecent seat
+      /// </summary>
+      /// <param name="current">The current model this tile belongs to</param>
+      /// <returns>The number of seats that are occupied</returns>
       private int GetAdjacentOccupied(Model current)
       {
          var numOccupied = 0;
@@ -67,25 +82,34 @@ namespace Day11
          }
          return numOccupied;
       }
+      /// <summary>
+      /// Does a line of sight check in each directory to see if the next seat is occupied
+      /// </summary>
+      /// <param name="current">The current model this tile belongs to</param>
+      /// <returns></returns>
       private int GetLineOfSightOccupied(Model current)
       {
          var numOccupied = 0;
+         // Go through each direction and keep steping that way until we find a seat
          foreach (var dir in Directions)
          {
             var x = X;
             var y = Y;
-            while(true)
+            while (true)
             {
                x += dir.X;
                y += dir.Y;
+               // If we get out of bounds of the model, exit loop
                if (x < 0 || y < 0 || x >= current.Rows || y >= current.Cols)
                   break;
-               if (current.arr[x,y].IsOccupied)
+               // If the seat we find is occupied, increment and exit loop
+               if (current.arr[x, y].IsOccupied)
                {
                   numOccupied++;
                   break;
                }
-               else if (current.arr[x,y].state == Tile.EMPTY)
+               // If we find an empty seat exit because we cannot see past that seat
+               else if (current.arr[x, y].state == Tile.EMPTY)
                {
                   break;
                }
@@ -93,6 +117,10 @@ namespace Day11
          }
          return numOccupied;
       }
+      /// <summary>
+      /// Cacluates the next state of this tile based on the model parameters
+      /// </summary>
+      /// <param name="current">The current model we are simulating</param>
       public void CalculateNext(Model current)
       {
          int numOccupied = 0;
@@ -117,11 +145,18 @@ namespace Day11
             newState = state;
          }
       }
+      /// <summary>
+      /// Advances the tile to the next state. This needs to happen at the same
+      /// time for all the tiles for accuracte calculations
+      /// </summary>
       public void Next()
       {
          state = newState;
       }
    }
+   /// <summary>
+   /// Model class is for setting up how the simulation for seats with various settings and initial state
+   /// </summary>
    public class Model
    {
       public Tile[,] arr;
@@ -154,7 +189,7 @@ namespace Day11
                str += arr[x, y].state;
             }
             str += Environment.NewLine;
-        }
+         }
          return str;
       }
       public void Step()
@@ -179,19 +214,19 @@ namespace Day11
          while (before != modelpt1.ToString())
          {
             before = modelpt1.ToString();
-                        Console.WriteLine(before);
+            Console.WriteLine(before);
             modelpt1.Step();
          }
          var part1Seats = from Tile tile in modelpt1.arr
                           where tile.IsOccupied
                           select tile;
          Console.WriteLine($"Part 1:{part1Seats.Count()}");
-         var modelpt2 = new Model(inputs,5,SearchType.LineOfSight);
+         var modelpt2 = new Model(inputs, 5, SearchType.LineOfSight);
          before = "";
          while (before != modelpt2.ToString())
          {
             before = modelpt2.ToString();
-          //  Console.WriteLine(before);
+            //  Console.WriteLine(before);
             modelpt2.Step();
          }
          var part2Seats = from Tile tile in modelpt2.arr
